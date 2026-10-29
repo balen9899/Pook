@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="ckb" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>فڵچە و ددان · پووک</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap">
+<style>
+/* Layout: one dark arcade column — score bar, tiled board canvas, optional thumb d-pad. Single dark look by choice. */
+:root{
+  --bg:#0b1230; --panel:#141d45; --ink:#f2f5ff; --muted:#9fa9d6;
+  --gum:#ec8aa5; --mint:#3ddc97; --sun:#ffd23f; --sign:#1c3aa9; --wa:#1fa855;
+  --font:"Vazirmatn","Noto Sans Arabic",Tahoma,system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%;background:var(--bg)}
+body{touch-action:none;overscroll-behavior:none}
+::backdrop{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:600px;margin:0 auto;padding-block:12px 20px;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));display:flex;flex-direction:column;gap:10px;align-items:center}
+.top{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.brand{display:flex;flex-direction:column;min-width:0}
+.brand b{font-weight:900;font-size:1.15rem;line-height:1.2}
+.brand small{color:var(--muted);font-size:.8rem}
+.langs{display:flex;background:rgba(255,255,255,.08);border-radius:999px;padding:3px;gap:2px;flex:none}
+.langs button{font:inherit;font-weight:700;font-size:.85rem;border:0;border-radius:999px;padding:3px 12px;background:transparent;color:var(--ink);cursor:pointer}
+.langs button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.hud{width:100%;display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--panel);border-radius:14px;padding:8px 14px}
+.stat{display:flex;flex-direction:column;align-items:center;min-width:0}
+.stat span{font-size:.72rem;color:var(--muted);letter-spacing:.03em}
+.stat b{font-size:1.25rem;font-weight:900;font-variant-numeric:tabular-nums;direction:ltr}
+.lives{display:flex;gap:3px;direction:ltr}
+.lives canvas{width:20px;height:20px}
+.stage{position:relative;line-height:0;touch-action:none}
+canvas#game{display:block;border-radius:12px;background:#09102a;touch-action:none}
+.overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:18px;text-align:center;background:rgba(9,16,42,.86);border-radius:12px;line-height:1.6}
+.overlay h1{margin:0;font-size:clamp(1.6rem,7vw,2.3rem);font-weight:900;line-height:1.2;color:var(--sun);text-wrap:balance}
+.overlay p{margin:0;max-width:34ch;color:var(--ink);font-size:.98rem}
+.overlay .tip{color:var(--mint);font-weight:700}
+.legend{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 14px}
+.legend div{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.78rem;color:var(--muted)}
+.legend canvas{width:38px;height:38px}
+.btn{font:inherit;font-weight:900;font-size:1.1rem;border:0;border-radius:14px;padding:12px 26px;cursor:pointer;background:var(--sun);color:#1a1a1a;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.btn.wa{background:var(--wa);color:#fff;font-size:1rem}
+.btn.ig{background:linear-gradient(45deg,#feda75 0%,#fa7e1e 22%,#d62976 50%,#962fbf 78%,#4f5bd5 100%);color:#fff;font-size:1rem}
+.btn svg{width:22px;height:22px}
+.row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.banner{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font-weight:900;font-size:1.5rem;color:var(--sun);text-shadow:0 2px 10px rgba(0,0,0,.8);pointer-events:none;line-height:1.4}
+.pad{display:grid;grid-template-columns:repeat(3,74px);grid-template-rows:repeat(3,64px);gap:8px;touch-action:none;direction:ltr}
+.pad button{border:0;border-radius:16px;background:var(--panel);color:var(--ink);display:grid;place-items:center;cursor:pointer;touch-action:none}
+.pad button:active{background:var(--sign)}
+.pad svg{width:34px;height:34px}
+.fs{flex:none;width:38px;height:34px;border:0;border-radius:999px;background:rgba(255,255,255,.08);color:var(--ink);display:grid;place-items:center;cursor:pointer}
+.fs svg{width:20px;height:20px}
+.fs[aria-pressed="true"]{background:var(--sun);color:#1a1a1a}
+.tools{display:flex;gap:8px;align-items:center}
+.pad .u{grid-column:2;grid-row:1}.pad .l{grid-column:1;grid-row:2}.pad .r{grid-column:3;grid-row:2}.pad .d{grid-column:2;grid-row:3}
+.keys{color:var(--muted);font-size:.85rem}
+.other{color:var(--sun);font-weight:700;text-decoration:underline;font-size:.95rem}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand"><b data-t="title">فڵچە و ددان</b><small data-t="sub">یارییەک لە پووک بۆ پزیشکی ددان</small></div>
+    <div class="tools">
+      <div class="langs" role="group" aria-label="Language">
+        <button data-lang="ku" aria-pressed="true">کوردی</button>
+        <button data-lang="ar" aria-pressed="false">عربي</button>
+      </div>
+      <button class="fs" id="padBtn" type="button" aria-label="Arrow buttons" aria-pressed="false">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z" opacity=".35"/><path d="M12 4.5l2 2.5h-4zM12 19.5l-2-2.5h4zM4.5 12l2.5-2v4zM19.5 12l-2.5 2v-4z"/></svg>
+      </button>
+      <button class="fs" id="fsBtn" type="button" aria-label="Full screen">
+        <svg id="fsIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="hud">
+    <div class="stat"><span data-t="score">خاڵ</span><b id="score">0</b></div>
+    <div class="stat"><span data-t="clean">ددانی پاککراو</span><b id="clean">0</b></div>
+    <div class="stat"><span data-t="best">باشترین</span><b id="best">0</b></div>
+  </div>
+
+  <div class="stage" id="stage">
+    <canvas id="game"></canvas>
+    <div class="banner" id="banner" hidden></div>
+    <div class="overlay" id="menu">
+      <h1 data-t="title">فڵچە و ددان</h1>
+      <p data-t="how">فڵچەکە بجوڵێنە و ددانە پیسەکان بشۆ. هەر ددانێک پاک بکەیتەوە فڵچەکە درێژتر دەبێت. خۆت لە دیوار و لە کلکی فڵچەکە بپارێزە!</p>
+      <div class="legend" id="legend"></div>
+      <button class="btn" id="startBtn" data-t="start">دەست پێبکە</button>
+      <p class="keys" data-t="ctrl">بە پەنجە ڕابکێشە، یان دوگمەکانی تیر لە سەرەوە بکەرەوە</p>
+    </div>
+    <div class="overlay" id="over" hidden>
+      <h1 data-t="over">یاری تەواو بوو</h1>
+      <p><span data-t="cleaned">ددانی پاککراو</span>: <b id="finalClean" style="direction:ltr;unicode-bidi:isolate">0</b> · <span data-t="score">خاڵ</span>: <b id="finalScore" style="direction:ltr;unicode-bidi:isolate">0</b></p>
+      <p class="tip" id="tip"></p>
+      <div class="row">
+        <button class="btn" id="againBtn" data-t="again">دووبارە یاری بکە</button>
+        <a class="btn wa" id="waBtn" href="https://wa.me/9647508508151" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3 21l2.1-5.2A8.5 8.5 0 1 1 21 11.5z"/></svg>
+          <span data-t="book">نۆرە بگرە</span>
+        </a>
+        <a class="btn ig" href="https://www.instagram.com/pook.dental.clinic" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.6" fill="currentColor"/></svg>
+          <span data-t="follow">فۆڵۆمان بکە لە Instagram</span>
+        </a>
+      </div>
+      <a class="other" id="otherGame" href="game.html#play" data-t="other">یارییەکی تر: ددانی پاڵەوان</a>
+    </div>
+  </div>
+
+  <div class="pad" id="pad" hidden>
+    <button class="u" data-d="up" aria-label="Up"><svg viewBox="0 0 24 24"><path d="M12 5l7 9H5z" fill="currentColor"/></svg></button>
+    <button class="l" data-d="left" aria-label="Left"><svg viewBox="0 0 24 24"><path d="M5 12l9-7v14z" fill="currentColor"/></svg></button>
+    <button class="r" data-d="right" aria-label="Right"><svg viewBox="0 0 24 24"><path d="M19 12l-9 7V5z" fill="currentColor"/></svg></button>
+    <button class="d" data-d="down" aria-label="Down"><svg viewBox="0 0 24 24"><path d="M12 19l-7-9h14z" fill="currentColor"/></svg></button>
+  </div>
+</div>
+
+<script>
+(() => {
+  const T = {
+    ku: { title:"فڵچە و ددان", sub:"یارییەک لە پووک بۆ پزیشکی ددان", score:"خاڵ", clean:"ددانی پاککراو", cleaned:"ددانی پاککراو", best:"باشترین",
+      how:"فڵچەکە بجوڵێنە و ددانە پیسەکان بشۆ. هەر ددانێک پاک بکەیتەوە فڵچەکە درێژتر دەبێت. خۆت لە دیوار و لە کلکی فڵچەکە بپارێزە!",
+      ctrl:"بە پەنجە ڕابکێشە، یان دوگمەکانی تیر لە سەرەوە بکەرەوە", start:"دەست پێبکە", ready:"ئامادەبە!",
+      over:"یاری تەواو بوو", again:"دووبارە یاری بکە", book:"نۆرە بگرە", follow:"فۆڵۆمان بکە لە Instagram", paused:"وەستاوە",
+      other:"یارییەکی تر: ددانی پاڵەوان", dirty:"ددانی پیس", crown:"تاجی زێڕین", brush:"فڵچە",
+      wamsg:"سڵاو، دەمەوێت نۆرە بگرم لە کلینیکی پووک.",
+      tips:["ڕۆژانە دوو جار، هەر جارێک دوو خولەک ددانەکانت بشۆ.","هەر سێ مانگ جارێک فڵچەکەت بگۆڕە.","بۆ نێوان ددانەکان دەزوو بەکاربهێنە.","هەر شەش مانگ جارێک سەردانی پزیشکی ددان بکە."] },
+    ar: { title:"الفرشاة والأسنان", sub:"لعبة من بووك لطب الأسنان", score:"النقاط", clean:"أسنان نظيفة", cleaned:"أسنان نظيفة", best:"الأفضل",
+      how:"حرّك الفرشاة ونظّف الأسنان المتسخة. كل سن تنظفه يجعل الفرشاة أطول. ابتعد عن الجدران وعن ذيل الفرشاة!",
+      ctrl:"اسحب بإصبعك، أو فعّل أزرار الأسهم من الأعلى", start:"ابدأ اللعب", ready:"استعد!",
+      over:"انتهت اللعبة", again:"العب مرة أخرى", book:"احجز موعداً", follow:"تابعنا على Instagram", paused:"متوقف",
+      other:"لعبة أخرى: السن البطل", dirty:"سن متسخ", crown:"تاج ذهبي", brush:"فرشاة",
+      wamsg:"مرحباً، أود حجز موعد في عيادة بووك.",
+      tips:["نظّف أسنانك مرتين يومياً، دقيقتين في كل مرة.","غيّر فرشاة أسنانك كل ثلاثة أشهر.","استخدم خيط الأسنان بين الأسنان.","زر طبيب الأسنان كل ستة أشهر."] }
+  };
+  const $ = id => document.getElementById(id);
+  let lang = "ku";
+  function applyLang(l) {
+    lang = l; document.documentElement.lang = l === "ku" ? "ckb" : "ar"; document.documentElement.dir = "rtl";
+    document.querySelectorAll("[data-t]").forEach(el => { el.textContent = T[l][el.dataset.t]; });
+    document.querySelectorAll(".langs button").forEach(b => b.setAttribute("aria-pressed", b.dataset.lang === l));
+    $("waBtn").href = "https://wa.me/9647508508151?text=" + encodeURIComponent(T[l].wamsg);
+    buildLegend();
+    try { localStorage.setItem("pook-lang", l); } catch {}
+  }
+  document.querySelectorAll(".langs button").forEach(b => b.addEventListener("click", () => applyLang(b.dataset.lang)));
+
+  // ---------- board ----------
+  const COLS = 15, ROWS = 19;
+  const cv = $("game"), ctx = cv.getContext("2d");
+  let CS = 22, dpr = 1, board = null, padOn = false;
+  try { padOn = localStorage.getItem("pook-tooth-pad") === "1"; } catch {}
+  function sizeCanvas() {
+    $("pad").hidden = !padOn;
+    const availW = Math.min(document.querySelector(".wrap").clientWidth - 32, 560);
+    const availH = Math.max(window.innerHeight - ((padOn ? 262 : 24) + 150), 300);
+    CS = Math.max(14, Math.floor(Math.min(availW / COLS, availH / ROWS)));
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width = COLS*CS*dpr; cv.height = ROWS*CS*dpr; cv.style.width = COLS*CS + "px"; cv.style.height = ROWS*CS + "px";
+    board = document.createElement("canvas"); board.width = cv.width; board.height = cv.height;
+    const g = board.getContext("2d"); g.scale(dpr, dpr);
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) { g.fillStyle = (r + c) % 2 ? "#0d1535" : "#101a40"; g.fillRect(c*CS, r*CS, CS, CS); }
+    g.strokeStyle = "#ec8aa5"; g.lineWidth = Math.max(3, CS*0.22); g.beginPath();
+    g.roundRect ? g.roundRect(g.lineWidth/2, g.lineWidth/2, COLS*CS - g.lineWidth, ROWS*CS - g.lineWidth, CS*0.5) : g.rect(0, 0, COLS*CS, ROWS*CS); g.stroke();
+  }
+
+  // ---------- drawings ----------
+  const INK = "#1b1b2e";
+  function toothPath(g, w, h) {
+    g.beginPath();
+    g.moveTo(-w, -h*0.3);
+    g.bezierCurveTo(-w, -h*1.05, -w*0.2, -h*1.05, 0, -h*0.72);
+    g.bezierCurveTo(w*0.2, -h*1.05, w, -h*1.05, w, -h*0.3);
+    g.bezierCurveTo(w, h*0.25, w*0.85, h*0.35, w*0.72, h*0.95);
+    g.bezierCurveTo(w*0.62, h*1.12, w*0.32, h*1.08, w*0.26, h*0.62);
+    g.quadraticCurveTo(0, h*0.36, -w*0.26, h*0.62);
+    g.bezierCurveTo(-w*0.32, h*1.08, -w*0.62, h*1.12, -w*0.72, h*0.95);
+    g.bezierCurveTo(-w*0.85, h*0.35, -w, h*0.25, -w, -h*0.3);
+    g.closePath();
+  }
+  function drawDirtyTooth(g, x, y, s, t) {
+    g.save(); g.translate(x, y + Math.sin(t*4)*s*0.04);
+    const w = s*0.44, h = s*0.44;
+    toothPath(g, w, h); g.fillStyle = "#efd98f"; g.fill(); g.lineWidth = Math.max(1.5, s*0.05); g.strokeStyle = "#8a6a1e"; g.stroke();
+    g.fillStyle = "rgba(120,80,20,.55)";
+    for (const [px, py, r] of [[-0.5, -0.55, 0.09], [0.45, -0.5, 0.07], [0.55, 0.15, 0.08], [-0.2, 0.5, 0.06], [-0.6, 0.1, 0.05]]) { g.beginPath(); g.arc(px*w, py*h, r*s, 0, Math.PI*2); g.fill(); }
+    g.fillStyle = INK; for (const ex of [-w*0.32, w*0.32]) { g.beginPath(); g.arc(ex, -h*0.2, s*0.05, 0, Math.PI*2); g.fill(); }
+    g.strokeStyle = INK; g.lineWidth = Math.max(1.2, s*0.04); g.lineCap = "round";
+    g.beginPath(); g.arc(0, h*0.28, w*0.25, 1.15*Math.PI, 1.85*Math.PI); g.stroke();   // sad mouth
+    g.restore();
+  }
+  function drawCrown(g, x, y, s, t, left) {
+    g.save(); g.translate(x, y + Math.sin(t*5)*s*0.05);
+    const w = s*0.46, h = s*0.46;
+    toothPath(g, w, h);
+    const gr = g.createLinearGradient(-w, -h, w, h); gr.addColorStop(0, "#fff3b0"); gr.addColorStop(0.5, "#ffc62a"); gr.addColorStop(1, "#d99400");
+    g.fillStyle = gr; g.fill(); g.lineWidth = Math.max(1.5, s*0.05); g.strokeStyle = "#8a5a00"; g.stroke();
+    g.fillStyle = "#fff"; for (let i = 0; i < 3; i++) { const a = t*2.5 + i*2.1, px = Math.cos(a)*s*0.55, py = Math.sin(a)*s*0.55, k = s*0.08;
+      g.beginPath(); g.moveTo(px, py - k); g.lineTo(px + k*0.3, py); g.lineTo(px, py + k); g.lineTo(px - k*0.3, py); g.fill(); g.beginPath(); g.moveTo(px - k, py); g.lineTo(px, py + k*0.3); g.lineTo(px + k, py); g.lineTo(px, py - k*0.3); g.fill(); }
+    g.fillStyle = INK; for (const ex of [-w*0.32, w*0.32]) { g.beginPath(); g.arc(ex, -h*0.2, s*0.05, 0, Math.PI*2); g.fill(); }
+    g.strokeStyle = INK; g.lineWidth = Math.max(1.2, s*0.04); g.lineCap = "round"; g.beginPath(); g.arc(0, h*0.02, w*0.28, 0.15*Math.PI, 0.85*Math.PI); g.stroke();
+    if (left != null) { g.strokeStyle = "#ffd23f"; g.lineWidth = Math.max(2, s*0.06); g.beginPath(); g.arc(0, 0, s*0.66, -Math.PI/2, -Math.PI/2 + Math.PI*2*left); g.stroke(); }
+    g.restore();
+  }
+  function drawCleanTooth(g, x, y, s, a) {
+    g.save(); g.globalAlpha = a; g.translate(x, y);
+    const w = s*0.44, h = s*0.44; toothPath(g, w, h); g.fillStyle = "#fff"; g.fill(); g.lineWidth = Math.max(1.5, s*0.05); g.strokeStyle = "#3ddc97"; g.stroke();
+    g.fillStyle = INK; for (const ex of [-w*0.32, w*0.32]) { g.beginPath(); g.arc(ex, -h*0.2, s*0.05, 0, Math.PI*2); g.fill(); }
+    g.strokeStyle = INK; g.lineWidth = Math.max(1.2, s*0.04); g.lineCap = "round"; g.beginPath(); g.arc(0, h*0.02, w*0.28, 0.15*Math.PI, 0.85*Math.PI); g.stroke();
+    g.restore();
+  }
+  // brush, seen from the side: pts = centers (px) from head to tail; dir = head direction
+  function drawBrush(g, pts, dir, s, t) {
+    g.lineCap = "round"; g.lineJoin = "round";
+    const [hx, hy] = pts[0];
+    let nx = hx - dir[0]*s*0.5, ny = hy - dir[1]*s*0.5;
+    if (pts.length > 1) { const vx = pts[1][0] - hx, vy = pts[1][1] - hy, L = Math.hypot(vx, vy) || 1; nx = hx + vx/L*Math.min(L, s*0.5); ny = hy + vy/L*Math.min(L, s*0.5); }
+    const handle = [[nx, ny], ...pts.slice(1)];
+    if (handle.length > 1) {
+      const path = (a) => { g.beginPath(); g.moveTo(handle[a][0], handle[a][1]); for (let i = a + 1; i < handle.length; i++) g.lineTo(handle[i][0], handle[i][1]); };
+      path(0); g.strokeStyle = INK; g.lineWidth = s*0.46; g.stroke();
+      path(0); g.strokeStyle = "#3f6df2"; g.lineWidth = s*0.36; g.stroke();
+      if (handle.length > 2) { path(1); g.strokeStyle = "#eaf2ff"; g.lineWidth = s*0.13; g.stroke(); }
+      const [tx, ty] = handle[handle.length - 1];
+      g.fillStyle = "#0b1230"; g.beginPath(); g.arc(tx, ty, s*0.08, 0, Math.PI*2); g.fill();
+    }
+    // head in profile: thin plastic head + a row of bristle tufts standing up + paste on top
+    g.save(); g.translate(hx, hy); g.rotate(Math.atan2(dir[1], dir[0]));
+    if (dir[0] < 0) g.scale(1, -1);           // keep bristles pointing up when going left
+    g.translate(0, s*0.16);
+    g.beginPath(); g.roundRect ? g.roundRect(-s*0.5, -s*0.07, s*1.0, s*0.17, s*0.08) : g.rect(-s*0.5, -s*0.07, s*1.0, s*0.17);
+    g.fillStyle = "#3f6df2"; g.fill(); g.lineWidth = Math.max(1.2, s*0.04); g.strokeStyle = INK; g.stroke();
+    const sway = Math.sin(t*22)*0.12;
+    for (let k = 0; k < 5; k++) {
+      const bx = -s*0.38 + k*s*0.19, bw = s*0.14, bh = s*0.46;
+      g.save(); g.translate(bx, -s*0.06); g.rotate(sway*(k % 2 ? 1 : -1)*0.4);
+      g.beginPath(); g.roundRect ? g.roundRect(-bw/2, -bh, bw, bh, [bw*0.45, bw*0.45, 1, 1]) : g.rect(-bw/2, -bh, bw, bh);
+      g.fillStyle = k % 2 ? "#7cc8ff" : "#ffffff"; g.fill(); g.lineWidth = Math.max(0.8, s*0.025); g.strokeStyle = INK; g.stroke();
+      g.restore();
+    }
+    // striped paste ribbon sitting on the bristles
+    g.beginPath(); g.moveTo(-s*0.36, -s*0.55);
+    g.quadraticCurveTo(-s*0.2, -s*0.72, -s*0.04, -s*0.57); g.quadraticCurveTo(s*0.12, -s*0.42, s*0.3, -s*0.6);
+    g.strokeStyle = INK; g.lineWidth = s*0.22; g.stroke();
+    g.strokeStyle = "#ffffff"; g.lineWidth = s*0.17; g.stroke();
+    g.strokeStyle = "#e5232f"; g.lineWidth = s*0.06; g.stroke();
+    g.restore();
+  }
+  function mini(draw) { const c = document.createElement("canvas"), d = Math.min(window.devicePixelRatio || 1, 2); c.width = 38*d; c.height = 38*d; const g = c.getContext("2d"); g.scale(d, d); draw(g); return c; }
+  function buildLegend() {
+    const L = $("legend"); L.innerHTML = "";
+    const items = [["brush", g => drawBrush(g, [[28, 22], [18, 22], [10, 22], [3, 22]], [1, 0], 15, 0)],
+                   ["dirty", g => drawDirtyTooth(g, 19, 21, 30, 0)],
+                   ["crown", g => drawCrown(g, 19, 21, 30, 0, null)]];
+    for (const [k, fn] of items) { const d = document.createElement("div"); d.appendChild(mini(fn)); const s = document.createElement("span"); s.textContent = T[lang][k]; d.appendChild(s); L.appendChild(d); }
+  }
+
+  // ---------- game state ----------
+  let state = "menu", stateT = 0, score = 0, cleaned = 0, best = 0, clock = 0;
+  let snake = [], prev = [], dir = [1, 0], queue = [], acc = 0, speed = 4.5, grow = 0;
+  let tooth = null, crown = null, effects = [];
+  try { best = +localStorage.getItem("pook-brush-best") || 0; } catch {}
+  function freeCell() {
+    for (let k = 0; k < 500; k++) {
+      const c = 1 + ((Math.random()*(COLS - 2)) | 0), r = 1 + ((Math.random()*(ROWS - 2)) | 0);
+      if (snake.some(p => p[0] === c && p[1] === r)) continue;
+      if (tooth && tooth[0] === c && tooth[1] === r) continue;
+      if (crown && crown.c === c && crown.r === r) continue;
+      return [c, r];
+    }
+    return [1, 1];
+  }
+  function newGame() {
+    const cy = (ROWS/2) | 0;
+    snake = [[6, cy], [5, cy], [4, cy], [3, cy]]; prev = snake.map(p => p.slice());
+    dir = [1, 0]; queue = []; acc = 0; speed = 4.5; grow = 0; score = 0; cleaned = 0; crown = null; effects = [];
+    tooth = null; tooth = freeCell(); hud(); setState("ready", 1.4);
+  }
+  function setState(s, t) {
+    state = s; stateT = t || 0;
+    const b = $("banner");
+    if (s === "ready") { b.textContent = T[lang].ready; b.hidden = false; }
+    else if (s === "paused") { b.textContent = T[lang].paused; b.hidden = false; }
+    else b.hidden = true;
+  }
+  function hud() {
+    $("score").textContent = score; $("clean").textContent = cleaned;
+    if (score > best) { best = score; try { localStorage.setItem("pook-brush-best", best); } catch {} }
+    $("best").textContent = best;
+  }
+  function tick() {
+    if (queue.length) { const d = queue.shift(); if (!(d[0] === -dir[0] && d[1] === -dir[1])) dir = d; }
+    const h = snake[0], nh = [h[0] + dir[0], h[1] + dir[1]];
+    const hitWall = nh[0] < 0 || nh[1] < 0 || nh[0] >= COLS || nh[1] >= ROWS;
+    const body = grow > 0 ? snake : snake.slice(0, -1);
+    if (hitWall || body.some(p => p[0] === nh[0] && p[1] === nh[1])) { die(); return; }
+    prev = snake.map(p => p.slice());
+    snake.unshift(nh);
+    if (grow > 0) { grow--; prev.push(prev[prev.length - 1].slice()); } else snake.pop();
+    if (tooth && nh[0] === tooth[0] && nh[1] === tooth[1]) {
+      cleaned++; score += 10; grow += 1; speed = Math.min(speed + 0.12, 10);
+      effects.push({ x: tooth[0], y: tooth[1], t: 1, kind: "clean" });
+      tooth = freeCell();
+      if (cleaned % 5 === 0 && !crown) { const p = freeCell(); crown = { c: p[0], r: p[1], life: 7, max: 7 }; }
+    }
+    if (crown && nh[0] === crown.c && nh[1] === crown.r) {
+      score += 50; grow += 2; effects.push({ x: crown.c, y: crown.r, t: 1, kind: "crown" }); crown = null;
+    }
+    hud();
+  }
+  function die() { setState("dying", 1.1); }
+  function gameOver() {
+    setState("over"); hud();
+    $("finalScore").textContent = score; $("finalClean").textContent = cleaned;
+    const tips = T[lang].tips; $("tip").textContent = tips[(Math.random()*tips.length) | 0];
+    $("over").hidden = false;
+  }
+  function update(dt) {
+    clock += dt;
+    for (let i = effects.length - 1; i >= 0; i--) { effects[i].t -= dt*1.2; if (effects[i].t <= 0) effects.splice(i, 1); }
+    if (state === "ready") { stateT -= dt; if (stateT <= 0) setState("play"); return; }
+    if (state === "dying") { stateT -= dt; if (stateT <= 0) gameOver(); return; }
+    if (state !== "play") return;
+    if (crown) { crown.life -= dt; if (crown.life <= 0) crown = null; }
+    acc += dt*speed;
+    while (acc >= 1 && state === "play") { acc -= 1; tick(); }
+  }
+
+  // ---------- render ----------
+  function render() {
+    ctx.setTransform(1, 0, 0, 1, 0, 0); if (board) ctx.drawImage(board, 0, 0);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const cx = c => c*CS + CS/2;
+    if (tooth) drawDirtyTooth(ctx, cx(tooth[0]), cx(tooth[1]), CS*1.05, clock);
+    if (crown) drawCrown(ctx, cx(crown.c), cx(crown.r), CS*1.1, clock, crown.life/crown.max);
+    for (const e of effects) {
+      const x = cx(e.x), y = cx(e.y) - (1 - e.t)*CS*1.2;
+      drawCleanTooth(ctx, x, y, CS*1.05, Math.max(0, e.t));
+      ctx.fillStyle = e.kind === "crown" ? "#ffd23f" : "#3ddc97";
+      for (let i = 0; i < 6; i++) { const a = i*Math.PI/3 + clock, rr = (1.2 - e.t)*CS; ctx.globalAlpha = Math.max(0, e.t); ctx.beginPath(); ctx.arc(cx(e.x) + Math.cos(a)*rr, cx(e.y) + Math.sin(a)*rr, CS*0.08, 0, Math.PI*2); ctx.fill(); }
+      ctx.globalAlpha = 1;
+    }
+    if (snake.length) {
+      const f = state === "play" ? Math.min(acc, 1) : (state === "ready" ? 0 : 1);
+      const pts = snake.map((p, i) => { const q = prev[i] || p; return [cx(q[0] + (p[0] - q[0])*f), cx(q[1] + (p[1] - q[1])*f)]; });
+      if (state !== "dying" || Math.floor(clock*10) % 2) drawBrush(ctx, pts, dir, CS*1.15, state === "play" ? clock : 0);
+    }
+  }
+  let last = performance.now();
+  function frame(now) { const dt = Math.min((now - last)/1000, 0.05); last = now; update(dt); render(); requestAnimationFrame(frame); }
+
+  // ---------- input ----------
+  const DIRMAP = { up:[0,-1], down:[0,1], left:[-1,0], right:[1,0] };
+  function want(name) {
+    const d = DIRMAP[name]; if (!d) return;
+    const lastD = queue.length ? queue[queue.length - 1] : dir;
+    if ((d[0] === lastD[0] && d[1] === lastD[1]) || (d[0] === -lastD[0] && d[1] === -lastD[1])) return;
+    if (queue.length < 2) queue.push(d);
+  }
+  addEventListener("keydown", e => {
+    const k = { ArrowUp:"up", ArrowDown:"down", ArrowLeft:"left", ArrowRight:"right", w:"up", s:"down", a:"left", d:"right", W:"up", S:"down", A:"left", D:"right" }[e.key];
+    if (k) { e.preventDefault(); want(k); }
+    if ((e.key === "Enter" || e.key === " ") && (state === "menu" || state === "over")) { e.preventDefault(); start(); }
+  });
+  document.querySelectorAll(".pad button").forEach(b => b.addEventListener("pointerdown", e => { e.preventDefault(); want(b.dataset.d); }));
+  let sx = 0, sy = 0, swiping = false;
+  addEventListener("pointerdown", e => { if (e.target.closest("button, a")) return; swiping = true; sx = e.clientX; sy = e.clientY; });
+  addEventListener("pointermove", e => {
+    if (!swiping) return; const dx = e.clientX - sx, dy = e.clientY - sy;
+    if (Math.hypot(dx, dy) < 18) return;
+    want(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "right" : "left") : (dy > 0 ? "down" : "up"));
+    sx = e.clientX; sy = e.clientY;
+  });
+  addEventListener("pointerup", () => { swiping = false; }); addEventListener("pointercancel", () => { swiping = false; });
+  document.addEventListener("visibilitychange", () => { if (document.hidden && state === "play") setState("paused"); });
+  $("stage").addEventListener("click", () => { if (state === "paused") setState("play"); });
+
+  const padBtn = $("padBtn"); padBtn.setAttribute("aria-pressed", padOn);
+  padBtn.addEventListener("click", () => { padOn = !padOn; padBtn.setAttribute("aria-pressed", padOn); try { localStorage.setItem("pook-tooth-pad", padOn ? "1" : "0"); } catch {} sizeCanvas(); });
+  const root = document.documentElement, fsReq = root.requestFullscreen || root.webkitRequestFullscreen;
+  const fsOn = () => document.fullscreenElement || document.webkitFullscreenElement;
+  if (!fsReq || !(document.fullscreenEnabled || document.webkitFullscreenEnabled)) $("fsBtn").hidden = true;
+  $("fsBtn").addEventListener("click", () => { try { if (fsOn()) (document.exitFullscreen || document.webkitExitFullscreen).call(document); else { const r = fsReq.call(root); if (r && r.catch) r.catch(() => { $("fsBtn").hidden = true; }); } } catch { $("fsBtn").hidden = true; } });
+  const onFs = () => { $("fsIcon").innerHTML = fsOn() ? '<path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/>' : '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>'; setTimeout(sizeCanvas, 60); };
+  document.addEventListener("fullscreenchange", onFs); document.addEventListener("webkitfullscreenchange", onFs);
+
+  function start() { $("menu").hidden = true; $("over").hidden = true; newGame(); }
+  $("startBtn").addEventListener("click", start); $("againBtn").addEventListener("click", start);
+
+  try { const s = localStorage.getItem("pook-lang"); if (s === "ar" || s === "ku") lang = s; } catch {}
+  applyLang(lang); sizeCanvas(); hud();
+  { const cy = (ROWS/2) | 0; snake = [[6, cy], [5, cy], [4, cy], [3, cy]]; prev = snake.map(p => p.slice()); tooth = [10, cy]; }
+  addEventListener("resize", sizeCanvas);
+  requestAnimationFrame(frame);
+  if (location.hash === "#play") start();
+})();
+</script>
+
+</body>
+</html>

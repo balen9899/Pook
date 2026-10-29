@@ -58,6 +58,7 @@ canvas#game{display:block;border-radius:12px;background:#09102a;touch-action:non
 .tools{display:flex;gap:8px;align-items:center}
 .pad .u{grid-column:2;grid-row:1}.pad .l{grid-column:1;grid-row:2}.pad .r{grid-column:3;grid-row:2}.pad .d{grid-column:2;grid-row:3}
 .keys{color:var(--muted);font-size:.85rem}
+.other{color:var(--sun);font-weight:700;text-decoration:underline;font-size:.95rem}
 :focus-visible{outline:3px solid var(--sun);outline-offset:2px}
 </style>
 
@@ -112,6 +113,7 @@ canvas#game{display:block;border-radius:12px;background:#09102a;touch-action:non
           <span data-t="follow">فۆڵۆمان بکە</span>
         </a>
       </div>
+      <a class="other" href="brush.html#play" data-t="other">یارییەکی تر: فڵچە و ددان</a>
     </div>
   </div>
 
@@ -130,14 +132,14 @@ canvas#game{display:block;border-radius:12px;background:#09102a;touch-action:non
     ku: { title:"ددانی پاڵەوان", sub:"یارییەک لە پووک بۆ پزیشکی ددان", score:"خاڵ", level:"ئاست", best:"باشترین",
       how:"خاڵە ددانشۆرەکان کۆبکەرەوە و خۆت لە سۆدا، چیپس، شیرینی و لیمۆ دوور بگرە. فڵچەی ددان بگرە بۆ ئەوەی ئەوان لێت ڕابکەن!",
       ctrl:"بە پەنجە ڕابکێشە، یان دوگمەکانی تیر لە سەرەوە بکەرەوە", start:"دەست پێبکە", ready:"ئامادەبە!", clear:"ئافەرین! ئاستی داهاتوو",
-      over:"یاری تەواو بوو", again:"دووبارە یاری بکە", book:"نۆرە بگرە", follow:"فۆڵۆمان بکە لە Instagram", paused:"وەستاوە",
+      over:"یاری تەواو بوو", again:"دووبارە یاری بکە", book:"نۆرە بگرە", follow:"فۆڵۆمان بکە لە Instagram", other:"یارییەکی تر: فڵچە و ددان", paused:"وەستاوە",
       soda:"سۆدا", chips:"چیپس", candy:"شیرینی", lemon:"لیمۆ", brush:"فڵچە",
       wamsg:"سڵاو، دەمەوێت نۆرە بگرم لە کلینیکی پووک.",
       tips:["ڕۆژانە دوو جار ددانەکانت بشۆ.","سۆدا و شیرینی کەم بکەرەوە.","هەر شەش مانگ جارێک سەردانی پزیشکی ددان بکە.","دوای خواردنی ترش، نیو کاتژمێر چاوەڕێ بکە پێش ددانشۆردن."] },
     ar: { title:"السن البطل", sub:"لعبة من بووك لطب الأسنان", score:"النقاط", level:"المستوى", best:"الأفضل",
       how:"اجمع حبيبات معجون الأسنان وابتعد عن المشروبات الغازية والشيبس والحلويات والليمون. التقط فرشاة الأسنان لتجعلها تهرب منك!",
       ctrl:"اسحب بإصبعك، أو فعّل أزرار الأسهم من الأعلى", start:"ابدأ اللعب", ready:"استعد!", clear:"أحسنت! المستوى التالي",
-      over:"انتهت اللعبة", again:"العب مرة أخرى", book:"احجز موعداً", follow:"تابعنا على Instagram", paused:"متوقف",
+      over:"انتهت اللعبة", again:"العب مرة أخرى", book:"احجز موعداً", follow:"تابعنا على Instagram", other:"لعبة أخرى: الفرشاة والأسنان", paused:"متوقف",
       soda:"مشروب غازي", chips:"شيبس", candy:"حلوى", lemon:"ليمون", brush:"فرشاة",
       wamsg:"مرحباً، أود حجز موعد في عيادة بووك.",
       tips:["نظّف أسنانك مرتين يومياً.","قلّل من المشروبات الغازية والحلويات.","زر طبيب الأسنان كل ستة أشهر.","بعد الأطعمة الحامضة، انتظر نصف ساعة قبل تنظيف أسنانك."] }
