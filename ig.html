@@ -48,7 +48,10 @@ main.inner{display:flex;flex-direction:column;gap:22px;padding-block:20px 40px}
 .social .tt{background:#000;color:#fff;border-left:3px solid #25f4ee;border-right:3px solid #fe2c55;box-shadow:0 6px 18px rgba(0,0,0,.25)}
 .social .tt .latin{font-family:var(--font);font-size:1em;font-weight:800}
 .social .ig,.social .tt{grid-column:auto;font-size:1.1rem;padding:15px 10px}
-.social .game{background:var(--sign);color:#fff;box-shadow:0 6px 18px rgba(28,58,169,.3)}
+.games{display:flex;flex-direction:column;gap:8px}
+.gamerow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gamerow .game{display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;font-weight:800;font-size:1.05rem;border-radius:16px;padding:15px 8px;min-width:0;background:var(--sign);color:#fff;box-shadow:0 6px 18px rgba(28,58,169,.3)}
+.gamerow .game svg{width:24px;height:24px;flex:none}
 .video{display:flex;flex-direction:column;gap:8px}
 .label{font-weight:800;font-size:1.1rem;margin:0}
 video{width:100%;max-width:100%;aspect-ratio:16/9;border-radius:14px;background:#000;display:block}
@@ -110,14 +113,6 @@ ol.steps li span{min-width:0}
       <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.6 3c.4 2.2 1.8 3.7 4 4v3.2c-1.5 0-2.9-.4-4-1.2v6.3a5.6 5.6 0 1 1-5.6-5.6c.3 0 .6 0 .9.1v3.3a2.4 2.4 0 1 0 1.5 2.2V3h3.2z"/></svg>
       <span class="latin">TikTok</span>
     </a>
-    <a class="game" href="game.html#play">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="7" width="19" height="11" rx="5"/><path d="M7.5 10.5v4M5.5 12.5h4"/><circle cx="15.5" cy="11.5" r="0.9" fill="currentColor"/><circle cx="17.5" cy="13.8" r="0.9" fill="currentColor"/></svg>
-      <span data-t="game">یاری بکە: ددانی پاڵەوان</span>
-    </a>
-    <a class="game" href="brush.html#play">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 16l9-9"/><rect x="12" y="3" width="8" height="5" rx="2" transform="rotate(45 16 5.5)"/></svg>
-      <span data-t="game2">یاری بکە: فڵچە و ددان</span>
-    </a>
   </nav>
 
   <section class="video">
@@ -132,6 +127,15 @@ ol.steps li span{min-width:0}
     <p class="hint" id="vstat" hidden></p>
     <p class="hint" data-t="vidhint">٣٨ چرکە، لە جادەی کۆیەوە تا دەرگای کلینیک.</p>
   </section>
+
+  <section class="games" aria-label="Games">
+    <h2 class="label" data-t="gamesh">یاری بکە</h2>
+    <div class="gamerow">
+      <a class="game" href="game.html#play"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="7" width="19" height="11" rx="5"/><path d="M7.5 10.5v4M5.5 12.5h4"/><circle cx="15.5" cy="11.5" r="0.9" fill="currentColor"/><circle cx="17.5" cy="13.8" r="0.9" fill="currentColor"/></svg><span data-t="g1">ددانی پاڵەوان</span></a>
+      <a class="game" href="brush.html#play"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 16l9-9"/><rect x="12" y="3" width="8" height="5" rx="2" transform="rotate(45 16 5.5)"/></svg><span data-t="g2">فڵچە و ددان</span></a>
+    </div>
+  </section>
+
 
   <section>
     <h2 class="label" data-t="stepsh">چۆن بگەیتە لامان</h2>
@@ -168,7 +172,7 @@ ol.steps li span{min-width:0}
       s3:"ڕاستەوخۆ بەسەر جادەی هەزەدا بڕۆ.",
       s4:"کلینیکەکە نزیک مزگەوتی فاروقە.",
       s5:"دەرگاکە لە تەنیشت نیشانەی ددانە ڕووناکەکەیە.",
-      wa:"نامە بنێرە لە WhatsApp", game:"یاری بکە: ددانی پاڵەوان", game2:"یاری بکە: فڵچە و ددان", callh:"پەیوەندیمان پێوە بکە", copy:"لەبەرگرتنەوە", copied:"لەبەرگیرایەوە", loading:"ڤیدیۆکە بار دەکرێت…", vfail:"ڤیدیۆکە بار نەبوو. پەڕەکە نوێ بکەرەوە." },
+      wa:"نامە بنێرە لە WhatsApp", gamesh:"یاری بکە", g1:"ددانی پاڵەوان", g2:"فڵچە و ددان", callh:"پەیوەندیمان پێوە بکە", copy:"لەبەرگرتنەوە", copied:"لەبەرگیرایەوە", loading:"ڤیدیۆکە بار دەکرێت…", vfail:"ڤیدیۆکە بار نەبوو. پەڕەکە نوێ بکەرەوە." },
     ar: { title:"بووك لطب الأسنان", addr:"أربيل، كسنزان، شارع هزه، قرب جامع الفاروق",
       maps:"افتح في خرائط جوجل", vidh:"فيديو الطريق", vidhint:"٣٨ ثانية، من طريق كويه حتى باب العيادة.",
       stepsh:"كيف تصل إلينا",
@@ -177,7 +181,7 @@ ol.steps li span{min-width:0}
       s3:"استمر مباشرةً على شارع هزه.",
       s4:"العيادة قرب جامع الفاروق.",
       s5:"المدخل بجانب لافتة السن المضيئة.",
-      wa:"راسلنا على WhatsApp", game:"العب: السن البطل", game2:"العب: الفرشاة والأسنان", callh:"اتصل بنا", copy:"نسخ", copied:"تم النسخ", loading:"جارٍ تحميل الفيديو…", vfail:"تعذّر تحميل الفيديو. أعد تحميل الصفحة." }
+      wa:"راسلنا على WhatsApp", gamesh:"العب", g1:"السن البطل", g2:"الفرشاة والأسنان", callh:"اتصل بنا", copy:"نسخ", copied:"تم النسخ", loading:"جارٍ تحميل الفيديو…", vfail:"تعذّر تحميل الفيديو. أعد تحميل الصفحة." }
   };
   let lang = "ku";
   function apply(l) {
