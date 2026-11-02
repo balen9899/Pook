@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="ckb" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>بخولێنە و ببەوە · پووک</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 48 48%22%3E%3Cpath d=%22M24 7c-4-3-12-3-15 3-3 7 1 13 3 19 1 4 1 12 5 12 3 0 3-9 7-9s4 9 7 9c4 0 4-8 5-12 2-6 6-12 3-19-3-6-11-6-15-3z%22 fill=%22%231c3aa9%22/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800;900&display=swap">
+<style>
+:root{
+  --bg:#f3f5fb; --surface:#fff; --fg:#141a33; --muted:#5b6382; --line:#dde2f0;
+  --sign:#1c3aa9; --navy:#13307a; --gold:#ffc531; --gold2:#ff9f14; --go:#16a650; --bad:#d23c3c;
+  --font:"Vazirmatn","Noto Sans Arabic",Tahoma,system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0c1022; --surface:#151b35; --fg:#eef1fb; --muted:#9aa3c4; --line:#262e52; --sign:#2c4fd0; color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0c1022; --surface:#151b35; --fg:#eef1fb; --muted:#9aa3c4; --line:#262e52; --sign:#2c4fd0; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);font-size:17px;line-height:1.6;overflow-x:hidden}
+.inner{max-width:520px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.band{background:linear-gradient(160deg,var(--sign),#0f2470);color:#fff}
+.band .inner{padding-block:16px 22px;display:flex;flex-direction:column;gap:10px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.05rem}
+.brand svg{width:38px;height:38px;flex:none}
+.langs{display:flex;background:rgba(255,255,255,.14);border-radius:999px;padding:4px;gap:2px}
+.langs button{font:inherit;font-weight:600;font-size:.92rem;border:0;border-radius:999px;padding:3px 13px;background:transparent;color:#fff;cursor:pointer}
+.langs button[aria-pressed="true"]{background:#fff;color:var(--sign)}
+h1{margin:0;font-weight:900;font-size:clamp(1.7rem,7vw,2.2rem);line-height:1.25}
+h1 .hl{color:var(--gold)}
+.sub{margin:0;opacity:.9}
+main.inner{display:flex;flex-direction:column;gap:18px;padding-block:18px 44px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px}
+.msg{text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+.msg .big{font-size:1.25rem;font-weight:800;margin:0}
+.msg .ico{font-size:2.6rem;line-height:1}
+.spinner{width:42px;height:42px;border-radius:50%;border:4px solid var(--line);border-top-color:var(--sign);animation:rot 1s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+form{display:flex;flex-direction:column;gap:13px}
+label{display:flex;flex-direction:column;gap:5px;font-weight:600;font-size:.95rem}
+input[type=text],input[type=tel],input[type=number]{font:inherit;font-size:1.05rem;padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--fg);width:100%}
+input:focus{outline:none;border-color:var(--sign)}
+input[type=tel]{direction:ltr;text-align:right}
+.row{display:flex;gap:10px}
+.row>*{flex:1}
+.seg{display:flex;gap:8px}
+.seg label{flex:1;flex-direction:row;align-items:center;justify-content:center;gap:6px;border:1.5px solid var(--line);border-radius:12px;padding:10px;cursor:pointer;background:var(--bg)}
+.seg input{accent-color:var(--sign)}
+.seg label:has(input:checked){border-color:var(--sign);background:color-mix(in srgb,var(--sign) 10%,var(--surface))}
+.fs{border:0;padding:0;margin:0;display:flex;flex-direction:column;gap:5px}
+.fs legend{font-weight:600;font-size:.95rem;padding:0;margin-bottom:5px}
+.check{flex-direction:row;align-items:flex-start;gap:9px;font-weight:400;font-size:.9rem;color:var(--muted)}
+.check input{margin-top:5px;accent-color:var(--sign);width:18px;height:18px;flex:none}
+.err{color:var(--bad);font-weight:600;font-size:.95rem;margin:0;text-align:center}
+.btn{font:inherit;font-weight:900;font-size:1.25rem;border:0;border-radius:16px;padding:15px 18px;cursor:pointer;color:var(--navy);
+  background:linear-gradient(90deg,var(--gold2),var(--gold));box-shadow:0 8px 22px rgba(255,159,20,.35);display:flex;justify-content:center;align-items:center;gap:10px;text-decoration:none}
+.btn:disabled{opacity:.6;cursor:wait}
+.btn.blue{background:var(--sign);color:#fff;box-shadow:0 6px 18px rgba(28,58,169,.3)}
+.btn.green{background:#1fa855;color:#fff;box-shadow:0 6px 18px rgba(31,168,85,.3)}
+.btn.ghost{background:transparent;color:var(--fg);border:1.5px solid var(--line);box-shadow:none;font-weight:800;font-size:1.05rem}
+.btn svg{width:24px;height:24px;flex:none}
+.wheelwrap{position:relative;width:min(88vw,360px);aspect-ratio:1;margin:4px auto 0}
+.wheelwrap canvas{width:100%;height:100%;display:block;filter:drop-shadow(0 10px 22px rgba(19,48,122,.3))}
+.pointer{position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:18px solid transparent;border-right:18px solid transparent;border-top:34px solid var(--navy);filter:drop-shadow(0 2px 2px rgba(0,0,0,.3));z-index:2}
+.hub{position:absolute;inset:0;margin:auto;width:22%;height:22%;border-radius:50%;background:#fff;border:5px solid var(--navy);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--navy);font-size:.95rem}
+.prizes{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin:0;padding:0;list-style:none}
+.prizes li{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px 12px;font-size:.88rem;font-weight:600}
+.win{text-align:center;display:flex;flex-direction:column;gap:12px;align-items:stretch;border:3px solid var(--gold);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 22%,var(--surface)),var(--surface) 60%)}
+.win .tag{align-self:center;background:var(--navy);color:#fff;border-radius:999px;padding:3px 16px;font-weight:800;font-size:.95rem}
+.win h2{margin:0;font-size:clamp(1.5rem,6.5vw,1.9rem);font-weight:900;line-height:1.3}
+.price{display:flex;justify-content:center;align-items:baseline;gap:14px;flex-wrap:wrap}
+.price .was{text-decoration:line-through;color:var(--muted);font-size:1.15rem;font-weight:600}
+.price .now{font-size:2rem;font-weight:900;color:var(--go)}
+.save{align-self:center;background:var(--go);color:#fff;border-radius:12px;padding:5px 16px;font-weight:800}
+.code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:1.5rem;font-weight:800;letter-spacing:.18em;direction:ltr;background:var(--bg);border:2px dashed var(--line);border-radius:12px;padding:8px}
+.terms{margin:0;padding:0 18px 0 0;text-align:start;color:var(--muted);font-size:.88rem}
+:dir(ltr) .terms{padding:0 0 0 18px}
+.shot{color:var(--muted);font-size:.9rem;margin:0}
+.actions{display:flex;flex-direction:column;gap:10px}
+.demo{background:#fff3cd;color:#664d03;text-align:center;font-weight:700;padding:6px;font-size:.9rem}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:50}
+</style>
+</head>
+<body>
+<div class="demo" id="demoBar" hidden>DEMO — ئەنجام پاشەکەوت ناکرێت / النتيجة لا تُحفظ</div>
+<header class="band">
+  <div class="inner">
+    <div class="top">
+      <div class="brand">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="24" fill="#fff"/><path d="M24 11c-3-2-9-2-11 2-2 5 1 10 2 14 1 3 1 9 4 9 2 0 2-7 5-7s3 7 5 7c3 0 3-6 4-9 1-4 4-9 2-14-2-4-8-4-11-2z" fill="#1c3aa9"/></svg>
+        <span data-t="clinic"></span>
+      </div>
+      <div class="langs" role="group" aria-label="Language">
+        <button type="button" data-lang="ckb" aria-pressed="true">کوردی</button>
+        <button type="button" data-lang="ar" aria-pressed="false">عربي</button>
+      </div>
+    </div>
+    <h1 data-t="title"></h1>
+    <p class="sub" data-t="sub"></p>
+  </div>
+</header>
+
+<main class="inner">
+  <!-- loading / messages -->
+  <section class="card msg" id="loading"><div class="spinner"></div><p data-t="checking"></p></section>
+  <section class="card msg" id="notice" hidden>
+    <div class="ico" id="noticeIco">🎟️</div>
+    <p class="big" id="noticeText"></p>
+    <a class="btn blue" href="ig.html" data-t="findus"></a>
+  </section>
+
+  <!-- wheel + form -->
+  <section id="play" hidden>
+    <div class="wheelwrap" aria-hidden="true">
+      <div class="pointer"></div>
+      <canvas id="wheel" width="720" height="720"></canvas>
+      <div class="hub">POOK</div>
+    </div>
+    <ul class="prizes" id="prizeList" style="margin-top:14px"></ul>
+  </section>
+
+  <section class="card" id="formCard" hidden>
+    <form id="form" novalidate>
+      <p style="margin:0;font-weight:800;font-size:1.1rem" data-t="formTitle"></p>
+      <label><span data-t="name"></span><input type="text" name="name" autocomplete="name" required maxlength="60"></label>
+      <div class="row">
+        <label><span data-t="age"></span><input type="number" name="age" inputmode="numeric" min="3" max="100" required></label>
+        <label><span data-t="area"></span><input type="text" name="area" required maxlength="60" data-ph="areaPh"></label>
+      </div>
+      <fieldset class="fs"><legend data-t="gender"></legend>
+        <div class="seg">
+          <label><input type="radio" name="gender" value="male" required><span data-t="male"></span></label>
+          <label><input type="radio" name="gender" value="female"><span data-t="female"></span></label>
+        </div>
+      </fieldset>
+      <label><span data-t="phoneL"></span><input type="tel" name="phone" inputmode="tel" autocomplete="tel" placeholder="07XX XXX XXXX" required maxlength="20"></label>
+      <fieldset class="fs"><legend data-t="plang"></legend>
+        <div class="seg">
+          <label><input type="radio" name="plang" value="ckb" checked><span>کوردی</span></label>
+          <label><input type="radio" name="plang" value="ar"><span>عربي</span></label>
+        </div>
+      </fieldset>
+      <label class="check"><input type="checkbox" name="ok" required><span data-t="consent"></span></label>
+      <p class="err" id="formErr" hidden></p>
+      <button class="btn" type="submit" id="spinBtn"><span data-t="spin"></span> 🎡</button>
+    </form>
+  </section>
+
+  <!-- result -->
+  <section class="card win" id="result" hidden>
+    <span class="tag" data-t="congrats"></span>
+    <h2 id="rName"></h2>
+    <div class="price"><span class="was" id="rWas"></span><span class="now" id="rNow"></span></div>
+    <span class="save" id="rSave"></span>
+    <div>
+      <p class="shot" data-t="yourcode" style="margin-bottom:6px"></p>
+      <div class="code" id="rCode"></div>
+    </div>
+    <p class="shot" data-t="screenshot"></p>
+    <div class="actions">
+      <a class="btn green" id="waBtn" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.7 14.9L2 22l5.3-1.3A10 10 0 1 0 12 2zm5.6 14.1c-.2.7-1.4 1.3-2 1.4-.5.1-1.2.1-1.9-.1a17 17 0 0 1-1.7-.6 13.3 13.3 0 0 1-5.1-4.5c-.4-.5-1-1.5-1-2.8s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.4 0 .5l-.3.5-.4.5c-.1.1-.3.3-.1.6.2.3.7 1.2 1.6 2 1.1 1 2 1.3 2.3 1.4.3.2.4.1.6-.1l.8-1c.2-.3.4-.2.6-.1l2 1c.3.1.5.2.5.3.1.1.1.7-.1 1.3z"/></svg>
+        <span data-t="book"></span></a>
+      <a class="btn blue" href="ig.html"><span data-t="findus"></span></a>
+      <a class="btn ghost" href="tel:+9647508508151">📞 <span dir="ltr">0750 850 8151</span></a>
+    </div>
+    <ul class="terms" id="terms"></ul>
+  </section>
+</main>
+<canvas id="confetti"></canvas>
+
+<script>
+/* ===== settings ===== */
+const API = "";                 // Google Apps Script web-app URL (…/exec). Empty = promotion not live yet.
+const LAST_DAY = "2027-01-31";
+const WA = "9647508508151";
+
+const PRIZES = {
+  I1:{c:"#ffc531",was:400000,now:340000,
+      ckb:["چاندنی ددانی ئیتاڵی + تاجی زیرکۆنیا","چاندنی ئیتاڵی"],
+      ar:["زراعة سن إيطالية + تاج زيركونيا","زراعة إيطالية"]},
+  I2:{c:"#2c76ba",was:350000,now:320000,
+      ckb:["چاندنی ددانی کۆری + تاجی زیرکۆنیا","چاندنی کۆری"],
+      ar:["زراعة سن كورية + تاج زيركونيا","زراعة كورية"]},
+  OR:{c:"#ff6b6b",was:"1,000,000 – 1,500,000",now:850000,save:650000,
+      ckb:["ڕاستکردنەوەی ددان (ئۆرسۆ) — چارەسەری تەواو","ڕاستکردنەوە"],
+      ar:["تقويم الأسنان — علاج كامل","تقويم"]},
+  EN:{c:"#13307a",was:80000,now:60000,
+      ckb:["چارەسەری ڕەگی ددان (لەگەڵ پڕکردنەوە)","ڕەگ"],
+      ar:["علاج عصب الأسنان (مع الحشوة)","علاج عصب"]},
+  ZC:{c:"#2ec48c",was:90000,now:72000,
+      ckb:["تاجی زیرکۆنیا / پرد (هەر ددانێک)","زیرکۆنیا"],
+      ar:["تاج زيركونيا / جسر (لكل سن)","زيركونيا"]},
+  EM:{c:"#ff9128",was:150000,now:125000,
+      ckb:["ئۆنلەی ئی-ماکس","ئی-ماکس"],
+      ar:["أونلاي إي ماكس","إي ماكس"]},
+  SC:{c:"#785adc",was:35000,now:23000,
+      ckb:["پاککردنەوە و پۆلیشکردنی ددان","پاککردنەوە"],
+      ar:["تنظيف وتلميع الأسنان","تنظيف"]},
+  FI:{c:"#1ca0dc",was:30000,now:25000,
+      ckb:["پڕکردنەوەی ددان (کۆمپۆزیت)","پڕکردنەوە"],
+      ar:["حشوة تجميلية (كومبوزيت)","حشوة"]},
+  CK:{c:"#e84393",was:null,now:0,
+      ckb:["پشکنین + تیشکی ددان بە خۆڕایی","پشکنینی خۆڕایی"],
+      ar:["فحص + أشعة مجاناً","فحص مجاني"]}
+};
+const ORDER = ["I1","SC","OR","FI","I2","CK","EN","EM","ZC"];
+
+const T = {
+  ckb:{clinic:"پووک بۆ پزیشکی ددان",title:'بخولێنە و <span class="hl">ببەوە!</span>',
+    sub:"زانیارییەکانت بنووسە، چەرخەکە بخولێنە و داشکاندنەکەت وەربگرە.",
+    checking:"پشکنینی کۆدەکە…",findus:"ناونیشان و ڕێگای نۆرینگە",
+    formTitle:"بۆ خولاندن، ئەم زانیارییانە پڕ بکەرەوە:",name:"ناوی تەواو",age:"تەمەن",area:"ناوچە",areaPh:"بۆ نموونە: کەسنەزان",
+    gender:"ڕەگەز",male:"نێر",female:"مێ",phoneL:"ژمارەی مۆبایل",plang:"زمانی پەیوەندی",
+    consent:"ڕازیم نۆرینگەی پووک بۆ نۆرە و خەڵاتەکەم پەیوەندیم پێوە بکات.",spin:"بخولێنە!",
+    congrats:"🎉 پیرۆزە! بردتەوە",yourcode:"کۆدی خەڵاتەکەت",
+    screenshot:"📸 سکرینشۆتی ئەم پەڕەیە بگرە و لە پێشوازی پیشانی بدە.",book:"نۆرە بگرە لە واتسئاپ",
+    save:"پاشەکەوت: ",upto:"تا ",free:"بە خۆڕایی",iqd:" دینار",
+    errFields:"تکایە هەموو خانەکان بە دروستی پڕ بکەرەوە (ژمارە بە 07 دەست پێبکات).",
+    errNet:"هەڵەیەک ڕوویدا، دووبارە هەوڵ بدەرەوە.",
+    used:"ئەم کۆدە پێشتر بەکارهاتووە.",invalid:"ئەم کۆدە دروست نییە.",expired:"ئەم پڕۆمۆشنە کۆتایی هاتووە.",
+    phone:"ئەم ژمارە مۆبایلە پێشتر خەڵاتی بردۆتەوە.",nocode:"کۆدی QR ی سەر کارتەکەت سکان بکە بۆ خولاندن.",
+    soon:"پڕۆمۆشنەکە بەم زووانە دەست پێدەکات!",
+    terms:["بەکاردێت تا ٣١ی کانوونی دووەمی ٢٠٢٧.","یەک خەڵات بۆ هەر کەسێک؛ لەگەڵ داشکاندنی تر کۆ ناکرێتەوە.",
+      "ئەم پەڕەیە یان کۆدەکە لە پێشوازی پیشان بدە؛ پێویستی بە نۆرە هەیە.","نرخەکە بۆ یەک ددانە؛ نرخی ڕاستکردنەوە بۆ چارەسەری تەواوە."],
+    wa:(p,c)=>`سڵاو، لە «بخولێنە و ببەوە»ی پووک بردمەوە: ${p}. کۆد: ${c}. دەمەوێت نۆرە بگرم.`},
+  ar:{clinic:"پووک لطب الأسنان",title:'أدِر العجلة <span class="hl">واربح!</span>',
+    sub:"أدخل معلوماتك، أدِر العجلة واحصل على خصمك.",
+    checking:"جارٍ التحقق من الرمز…",findus:"عنوان العيادة والطريق",
+    formTitle:"لتدوير العجلة، املأ المعلومات التالية:",name:"الاسم الكامل",age:"العمر",area:"المنطقة",areaPh:"مثال: كسنزان",
+    gender:"الجنس",male:"ذكر",female:"أنثى",phoneL:"رقم الهاتف",plang:"لغة التواصل",
+    consent:"أوافق على أن تتواصل معي عيادة پووک بخصوص الموعد والجائزة.",spin:"أدِر العجلة!",
+    congrats:"🎉 مبروك! لقد ربحت",yourcode:"رمز جائزتك",
+    screenshot:"📸 خذ لقطة شاشة لهذه الصفحة واعرضها في الاستقبال.",book:"احجز عبر واتساب",
+    save:"وفّرت: ",upto:"حتى ",free:"مجاناً",iqd:" دينار",
+    errFields:"يرجى ملء جميع الحقول بشكل صحيح (الرقم يبدأ بـ 07).",
+    errNet:"حدث خطأ، حاول مرة أخرى.",
+    used:"تم استخدام هذا الرمز مسبقاً.",invalid:"هذا الرمز غير صحيح.",expired:"انتهى هذا العرض.",
+    phone:"هذا الرقم ربح جائزة مسبقاً.",nocode:"امسح رمز QR الموجود على بطاقتك لتدوير العجلة.",
+    soon:"يبدأ العرض قريباً!",
+    terms:["صالحة حتى ٣١ كانون الثاني ٢٠٢٧.","جائزة واحدة لكل شخص، ولا تُجمع مع عروض أخرى.",
+      "اعرض هذه الصفحة أو الرمز في الاستقبال؛ الحجز مطلوب.","السعر لكل سن؛ سعر التقويم للعلاج الكامل."],
+    wa:(p,c)=>`مرحباً، ربحت في عجلة پووک: ${p}. الرمز: ${c}. أريد حجز موعد.`}
+};
+
+/* ===== state ===== */
+const qs = new URLSearchParams(location.search);
+const CODE = (qs.get("c")||"").toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,12);
+const DEMO = qs.get("demo")==="1";
+let lang = qs.get("l")==="ar" ? "ar" : "ckb";
+try{ const s=localStorage.getItem("pook-lang"); if(!qs.get("l") && (s==="ar"||s==="ckb")) lang=s; }catch(e){}
+let won = null;     // {prize, code}
+let noticeKey = null;
+let wheelAngle = 0; // radians
+
+const $ = id => document.getElementById(id);
+const fmt = n => "\u2066" + (typeof n==="number" ? n.toLocaleString("en-US") : n) + "\u2069";
+
+function applyLang(){
+  const t=T[lang];
+  document.documentElement.lang = lang;
+  document.title = (lang==="ar"?"أدِر واربح":"بخولێنە و ببەوە")+" · "+t.clinic;
+  document.querySelectorAll("[data-t]").forEach(el=>{ const v=t[el.dataset.t]; if(typeof v==="string") el.innerHTML=v; });
+  document.querySelectorAll("[data-ph]").forEach(el=>el.placeholder=t[el.dataset.ph]);
+  document.querySelectorAll(".langs button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.lang===lang));
+  $("prizeList").innerHTML = ORDER.map(k=>`<li>${PRIZES[k][lang][1]}</li>`).join("");
+  if(noticeKey) $("noticeText").textContent = t[noticeKey];
+  if(won) showResult(false);
+  drawWheel();
+}
+document.querySelectorAll(".langs button").forEach(b=>b.addEventListener("click",()=>{
+  lang=b.dataset.lang; try{localStorage.setItem("pook-lang",lang)}catch(e){} applyLang();
+}));
+
+function show(id){ ["loading","notice","play","formCard","result"].forEach(x=>$(x).hidden = !(Array.isArray(id)?id.includes(x):x===id)); }
+function notice(key, ico){ noticeKey=key; $("noticeIco").textContent=ico||"🎟️"; $("noticeText").textContent=T[lang][key]; show("notice"); }
+
+/* ===== wheel ===== */
+const cv=$("wheel"), cx=cv.getContext("2d");
+function drawWheel(){
+  const n=ORDER.length, R=cv.width/2, seg=2*Math.PI/n;
+  cx.clearRect(0,0,cv.width,cv.height);
+  cx.save(); cx.translate(R,R); cx.rotate(wheelAngle);
+  cx.beginPath(); cx.arc(0,0,R-2,0,2*Math.PI); cx.fillStyle="#fff"; cx.fill();
+  ORDER.forEach((k,i)=>{
+    const a0=-Math.PI/2 - seg/2 + i*seg;
+    cx.beginPath(); cx.moveTo(0,0); cx.arc(0,0,R-16,a0,a0+seg); cx.closePath();
+    cx.fillStyle=PRIZES[k].c; cx.fill(); cx.lineWidth=4; cx.strokeStyle="#fff"; cx.stroke();
+    cx.save(); cx.rotate(a0+seg/2);
+    cx.fillStyle = ["I1","ZC"].includes(k) ? "#13307a" : "#fff";
+    cx.font="800 34px Vazirmatn, Tahoma, sans-serif"; cx.textAlign="center"; cx.textBaseline="middle";
+    cx.translate(R*0.6,0); cx.rotate(Math.PI/2);
+    const label=PRIZES[k][lang][1], MAXW=150;
+    const words=label.split(" ");
+    const lines = (words.length>1 && cx.measureText(label).width>MAXW) ? [words[0], words.slice(1).join(" ")] : [label];
+    let size=34; const widest=()=>Math.max(...lines.map(l=>cx.measureText(l).width));
+    while(widest()>MAXW && size>20){ size-=2; cx.font="800 "+size+"px Vazirmatn, Tahoma, sans-serif"; }
+    if(lines.length===2){ cx.fillText(lines[0],0,-size*0.6); cx.fillText(lines[1],0,size*0.6); }
+    else cx.fillText(label,0,0);
+    cx.restore();
+  });
+  // studs
+  for(let i=0;i<ORDER.length*2;i++){ const a=i*Math.PI/ORDER.length; cx.beginPath(); cx.arc(Math.cos(a)*(R-9),Math.sin(a)*(R-9),5,0,2*Math.PI); cx.fillStyle="#ffc531"; cx.fill(); }
+  cx.restore();
+}
+function spinTo(key){
+  return new Promise(res=>{
+    const n=ORDER.length, seg=2*Math.PI/n, i=ORDER.indexOf(key);
+    // segment i is centred at angle i*seg from the top; rotate so it lands under the pointer
+    const jitter=(Math.random()-.5)*seg*0.6;
+    const target = -(i*seg) + jitter;
+    const start = wheelAngle % (2*Math.PI);
+    let end = target - 2*Math.PI*7;
+    while(end > start - 2*Math.PI*6) end -= 2*Math.PI;
+    const dur=5200, t0=performance.now();
+    const ease=t=>1-Math.pow(1-t,4);
+    (function f(now){
+      const t=Math.min(1,(now-t0)/dur);
+      wheelAngle = start + (end-start)*ease(t);
+      drawWheel();
+      if(t<1) requestAnimationFrame(f); else res();
+    })(t0);
+  });
+}
+// idle drift so it feels alive
+let idle=true;
+(function drift(){ if(idle){ wheelAngle-=0.004; drawWheel(); } requestAnimationFrame(drift); })();
+
+/* ===== result ===== */
+function showResult(celebrate){
+  const p=PRIZES[won.prize], t=T[lang], name=p[lang][0];
+  $("rName").textContent=name;
+  $("rWas").textContent = p.was ? fmt(p.was)+t.iqd : "";
+  $("rWas").hidden = !p.was;
+  $("rNow").textContent = p.now ? fmt(p.now)+t.iqd : t.free;
+  const save = p.save || (typeof p.was==="number" ? p.was-p.now : 0);
+  $("rSave").hidden = !save;
+  $("rSave").textContent = t.save + (p.save? t.upto:"") + fmt(save) + t.iqd;
+  $("rCode").textContent = won.code;
+  $("terms").innerHTML = t.terms.map(x=>`<li>${x}</li>`).join("");
+  $("waBtn").href = "https://wa.me/"+WA+"?text="+encodeURIComponent(t.wa(name, won.code));
+  show(["play","result"]);
+  if(celebrate){ confetti(); setTimeout(()=>$("result").scrollIntoView({behavior:"smooth",block:"start"}),300); }
+}
+
+/* ===== confetti ===== */
+function confetti(){
+  const c=$("confetti"), g=c.getContext("2d"); c.width=innerWidth; c.height=innerHeight;
+  const cols=["#ffc531","#ff9f14","#1c3aa9","#2ec48c","#ff6b6b","#785adc","#1ca0dc"];
+  const ps=Array.from({length:170},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height*.6,
+    vx:(Math.random()-.5)*3,vy:2+Math.random()*4,r:Math.random()*6.28,vr:(Math.random()-.5)*.3,
+    w:6+Math.random()*7,h:9+Math.random()*9,c:cols[Math.floor(Math.random()*cols.length)]}));
+  const t0=performance.now();
+  (function f(now){
+    g.clearRect(0,0,c.width,c.height);
+    ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.04;p.r+=p.vr;g.save();g.translate(p.x,p.y);g.rotate(p.r);g.fillStyle=p.c;g.fillRect(-p.w/2,-p.h/2,p.w,p.h);g.restore();});
+    if(now-t0<5500) requestAnimationFrame(f); else g.clearRect(0,0,c.width,c.height);
+  })(t0);
+}
+
+/* ===== flow ===== */
+function remember(){ try{localStorage.setItem("pook-win-"+won.code, JSON.stringify(won))}catch(e){} }
+function recall(){ try{ const s=localStorage.getItem("pook-win-"+CODE); return s?JSON.parse(s):null; }catch(e){ return null; } }
+
+async function api(method, body){
+  const opt = method==="GET" ? {} : {method:"POST", body:JSON.stringify(body)}; // text/plain: no preflight
+  const url = method==="GET" ? API+"?action=check&c="+encodeURIComponent(CODE) : API;
+  const r = await fetch(url, opt);
+  return r.json();
+}
+
+async function start(){
+  applyLang();
+  if(DEMO) $("demoBar").hidden=false;
+  const prev = recall();
+  if(prev){ won=prev; idle=false; showResult(false); return; }
+  if(!CODE) return notice("nocode","📷");
+  if(new Date() > new Date(LAST_DAY+"T23:59:59+03:00")) return notice("expired","⌛");
+  if(!API && !DEMO) return notice("soon","⏳");
+  if(DEMO){ show(["play","formCard"]); return; }
+  try{
+    const r = await api("GET");
+    if(r.status==="valid") show(["play","formCard"]);
+    else notice(r.status==="used"?"used":r.status==="expired"?"expired":"invalid", r.status==="used"?"🔒":"⚠️");
+  }catch(e){ notice("errNet","📶"); }
+}
+
+$("form").addEventListener("submit", async ev=>{
+  ev.preventDefault();
+  const f=ev.target, t=T[lang], err=$("formErr");
+  const phone = f.phone.value.replace(/[٠-٩]/g,d=>"٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[۰-۹]/g,d=>"۰۱۲۳۴۵۶۷۸۹".indexOf(d)).replace(/\D/g,"").replace(/^00964|^964/,"");
+  const phoneN = phone.startsWith("0") ? phone : "0"+phone;
+  const age=parseInt(f.age.value,10);
+  if(f.name.value.trim().length<2 || !(age>=3&&age<=100) || f.area.value.trim().length<2 || !f.gender.value || !/^07\d{9}$/.test(phoneN) || !f.ok.checked){
+    err.textContent=t.errFields; err.hidden=false; return;
+  }
+  err.hidden=true;
+  const btn=$("spinBtn"); btn.disabled=true;
+  const body={c:CODE,name:f.name.value.trim(),age,gender:f.gender.value,area:f.area.value.trim(),phone:phoneN,lang:f.plang.value};
+  let prize;
+  try{
+    if(DEMO){ prize = ORDER[Math.floor(Math.random()*ORDER.length)]; }
+    else{
+      const r = await api("POST", body);
+      if(!r.ok){
+        btn.disabled=false;
+        if(r.error==="fields"){ err.textContent=t.errFields; err.hidden=false; return; }
+        if(r.error==="phone"){ err.textContent=t.phone; err.hidden=false; return; }
+        return notice(r.error==="used"?"used":r.error==="expired"?"expired":"invalid","🔒");
+      }
+      prize = r.prize;
+    }
+  }catch(e){ btn.disabled=false; err.textContent=t.errNet; err.hidden=false; return; }
+  won={prize, code:CODE};
+  if(!DEMO) remember();
+  $("formCard").hidden=true;
+  idle=false;
+  document.querySelector(".wheelwrap").scrollIntoView({behavior:"smooth",block:"center"});
+  await spinTo(prize);
+  showResult(true);
+});
+
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(drawWheel);
+start();
+</script>
+</body>
+</html>
