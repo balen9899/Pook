@@ -75,6 +75,9 @@ input[type=tel]{direction:ltr;text-align:right}
 .price{display:flex;justify-content:center;align-items:baseline;gap:14px;flex-wrap:wrap}
 .price .was{text-decoration:line-through;color:var(--muted);font-size:1.15rem;font-weight:600}
 .price .now{font-size:2rem;font-weight:900;color:var(--go)}
+.warr{margin:0;font-weight:800;color:var(--navy);display:flex;justify-content:center;align-items:center;gap:6px}
+:root[data-theme="dark"] .warr{color:var(--gold)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .warr{color:var(--gold)}}
 .save{align-self:center;background:var(--go);color:#fff;border-radius:12px;padding:5px 16px;font-weight:800}
 .code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:1.5rem;font-weight:800;letter-spacing:.18em;direction:ltr;background:var(--bg);border:2px dashed var(--line);border-radius:12px;padding:8px}
 .terms{margin:0;padding:0 18px 0 0;text-align:start;color:var(--muted);font-size:.88rem}
@@ -156,6 +159,8 @@ input[type=tel]{direction:ltr;text-align:right}
     <h2 id="rName"></h2>
     <div class="price"><span class="was" id="rWas"></span><span class="now" id="rNow"></span></div>
     <span class="save" id="rSave"></span>
+    <p class="warr" id="rWarr"></p>
+    <p class="shot" id="rTr" hidden></p>
     <div>
       <p class="shot" data-t="yourcode" style="margin-bottom:6px"></p>
       <div class="code" id="rCode"></div>
@@ -180,35 +185,29 @@ const LAST_DAY = "2027-01-31";
 const WA = "9647508508151";
 
 const PRIZES = {
-  I1:{c:"#ffc531",was:400000,now:365000,
+  IT:{c:"#ffc531",was:400000,now:375000,w:5,tr:true,
       ckb:["چاندنی ددانی ئیتاڵی + تاجی زیرکۆنیا","چاندنی ئیتاڵی"],
       ar:["زراعة سن إيطالية + تاج زيركونيا","زراعة إيطالية"]},
-  I2:{c:"#2c76ba",was:350000,now:340000,
-      ckb:["چاندنی ددانی کۆری + تاجی زیرکۆنیا","چاندنی کۆری"],
-      ar:["زراعة سن كورية + تاج زيركونيا","زراعة كورية"]},
-  OR:{c:"#ff6b6b",was:"1,000,000 – 1,500,000",now:850000,save:650000,
+  OR:{c:"#ff6b6b",was:"1,000,000 – 1,500,000",now:850000,save:650000,w:2,tr:true,ortho:true,
       ckb:["ڕاستکردنەوەی ددان (ئۆرسۆ) — چارەسەری تەواو","ڕاستکردنەوە"],
       ar:["تقويم الأسنان — علاج كامل","تقويم"]},
-  EN:{c:"#13307a",was:80000,now:70000,
+  EN:{c:"#13307a",was:80000,now:72000,w:2,
       ckb:["چارەسەری ڕەگی ددان (لەگەڵ پڕکردنەوە)","ڕەگ"],
       ar:["علاج عصب الأسنان (مع الحشوة)","علاج عصب"]},
-  ZC:{c:"#2ec48c",was:90000,now:85000,
+  ZC:{c:"#2ec48c",was:90000,now:85000,w:3,
       ckb:["تاجی زیرکۆنیا / پرد (هەر ددانێک)","زیرکۆنیا"],
       ar:["تاج زيركونيا / جسر (لكل سن)","زيركونيا"]},
-  EM:{c:"#ff9128",was:150000,now:130000,
+  EM:{c:"#ff9128",was:150000,now:130000,w:3,
       ckb:["ئۆنلەی ئی-ماکس","ئی-ماکس"],
       ar:["أونلاي إي ماكس","إي ماكس"]},
   SC:{c:"#785adc",was:35000,now:25000,
       ckb:["پاککردنەوە و پۆلیشکردنی ددان","پاککردنەوە"],
       ar:["تنظيف وتلميع الأسنان","تنظيف"]},
-  FI:{c:"#1ca0dc",was:30000,now:25000,
-      ckb:["پڕکردنەوەی ددان (کۆمپۆزیت)","پڕکردنەوە"],
-      ar:["حشوة تجميلية (كومبوزيت)","حشوة"]},
   CK:{c:"#e84393",was:null,now:0,
       ckb:["پشکنین + تیشکی ددان بە خۆڕایی","پشکنینی خۆڕایی"],
       ar:["فحص + أشعة مجاناً","فحص مجاني"]}
 };
-const ORDER = ["I1","SC","OR","CK","I2","EN","EM","ZC"];
+const ORDER = ["IT","SC","OR","CK","EN","EM","ZC"];
 
 const T = {
   ckb:{clinic:"پووک بۆ پزیشکی ددان",title:'بخولێنە و <span class="hl">ببەوە!</span>',
@@ -219,14 +218,14 @@ const T = {
     consent:"ڕازیم نۆرینگەی پووک بۆ نۆرە و خەڵاتەکەم پەیوەندیم پێوە بکات.",spin:"بخولێنە!",
     congrats:"🎉 پیرۆزە! بردتەوە",yourcode:"کۆدی خەڵاتەکەت",
     screenshot:"📸 سکرینشۆتی ئەم پەڕەیە بگرە و لە پێشوازی پیشانی بدە.",book:"نۆرە بگرە لە واتسئاپ",
-    save:"پاشەکەوت: ",upto:"تا ",free:"بە خۆڕایی",iqd:" دینار",
+    save:"پاشەکەوت: ",warr:n=>`گەرەنتی ${n} ساڵ`,warrO:n=>`گەرەنتی ${n} ساڵ دوای تەواوبوون (بە بەکارهێنانی ڕیتەینەر)`,transfer:"👨‍👩‍👧 دەتوانیت ئەم خەڵاتە بدەیت بە ئەندامێکی خێزانەکەت.",upto:"تا ",free:"بە خۆڕایی",iqd:" دینار",
     errFields:"تکایە هەموو خانەکان بە دروستی پڕ بکەرەوە (ژمارە بە 07 دەست پێبکات).",
     errNet:"هەڵەیەک ڕوویدا، دووبارە هەوڵ بدەرەوە.",
     used:"ئەم کۆدە پێشتر بەکارهاتووە.",invalid:"ئەم کۆدە دروست نییە.",expired:"ئەم پڕۆمۆشنە کۆتایی هاتووە.",
     phone:"ئەم ژمارە مۆبایلە پێشتر خەڵاتی بردۆتەوە.",nocode:"کۆدی QR ی سەر کارتەکەت سکان بکە بۆ خولاندن.",
     soon:"پڕۆمۆشنەکە بەم زووانە دەست پێدەکات!",
-    terms:["بەکاردێت تا ٣١ی کانوونی دووەمی ٢٠٢٧.","یەک خەڵات بۆ هەر کەسێک؛ لەگەڵ داشکاندنی تر کۆ ناکرێتەوە.",
-      "ئەم پەڕەیە یان کۆدەکە لە پێشوازی پیشان بدە؛ پێویستی بە نۆرە هەیە.","نرخەکە بۆ یەک ددانە؛ نرخی ڕاستکردنەوە بۆ چارەسەری تەواوە."],
+    terms:["بەکاردێت تا ٣١ی کانوونی دووەمی ٢٠٢٧.","یەک خەڵات بۆ هەر کۆدێک؛ لەگەڵ داشکاندنی تر کۆ ناکرێتەوە.",
+      "ئەم پەڕەیە یان کۆدەکە لە پێشوازی پیشان بدە؛ پێویستی بە نۆرە هەیە.","نرخەکە بۆ یەک ددانە؛ نرخی ڕاستکردنەوە بۆ چارەسەری تەواوە.","هەموو کارەکان گەرەنتی کەمتر نییە لە ٢ ساڵ؛ تاج و ئۆنلەی ٣ ساڵ، چاندن ٥ ساڵ — بە مەرجی سەردانی پشکنینی ساڵانە لە پووک."],
     wa:(p,c)=>`سڵاو، لە «بخولێنە و ببەوە»ی پووک بردمەوە: ${p}. کۆد: ${c}. دەمەوێت نۆرە بگرم.`},
   ar:{clinic:"پووک لطب الأسنان",title:'أدِر العجلة <span class="hl">واربح!</span>',
     sub:"أدخل معلوماتك، أدِر العجلة واحصل على خصمك.",
@@ -236,14 +235,14 @@ const T = {
     consent:"أوافق على أن تتواصل معي عيادة پووک بخصوص الموعد والجائزة.",spin:"أدِر العجلة!",
     congrats:"🎉 مبروك! لقد ربحت",yourcode:"رمز جائزتك",
     screenshot:"📸 خذ لقطة شاشة لهذه الصفحة واعرضها في الاستقبال.",book:"احجز عبر واتساب",
-    save:"وفّرت: ",upto:"حتى ",free:"مجاناً",iqd:" دينار",
+    save:"وفّرت: ",warr:n=>`ضمان ${n} ${n>2?"سنوات":"سنتين"}`.replace("ضمان 2 سنتين","ضمان سنتين"),warrO:n=>`ضمان سنتين بعد انتهاء العلاج (مع ارتداء المثبّت)`,transfer:"👨‍👩‍👧 يمكنك إهداء هذه الجائزة لأحد أفراد عائلتك.",upto:"حتى ",free:"مجاناً",iqd:" دينار",
     errFields:"يرجى ملء جميع الحقول بشكل صحيح (الرقم يبدأ بـ 07).",
     errNet:"حدث خطأ، حاول مرة أخرى.",
     used:"تم استخدام هذا الرمز مسبقاً.",invalid:"هذا الرمز غير صحيح.",expired:"انتهى هذا العرض.",
     phone:"هذا الرقم ربح جائزة مسبقاً.",nocode:"امسح رمز QR الموجود على بطاقتك لتدوير العجلة.",
     soon:"يبدأ العرض قريباً!",
-    terms:["صالحة حتى ٣١ كانون الثاني ٢٠٢٧.","جائزة واحدة لكل شخص، ولا تُجمع مع عروض أخرى.",
-      "اعرض هذه الصفحة أو الرمز في الاستقبال؛ الحجز مطلوب.","السعر لكل سن؛ سعر التقويم للعلاج الكامل."],
+    terms:["صالحة حتى ٣١ كانون الثاني ٢٠٢٧.","جائزة واحدة لكل رمز، ولا تُجمع مع عروض أخرى.",
+      "اعرض هذه الصفحة أو الرمز في الاستقبال؛ الحجز مطلوب.","السعر لكل سن؛ سعر التقويم للعلاج الكامل.","جميع الأعمال مضمونة لمدة لا تقل عن سنتين؛ التيجان والأونلاي ٣ سنوات، والزراعة ٥ سنوات — بشرط الفحص السنوي في پووک."],
     wa:(p,c)=>`مرحباً، ربحت في عجلة پووک: ${p}. الرمز: ${c}. أريد حجز موعد.`}
 };
 
@@ -291,7 +290,7 @@ function drawWheel(){
     cx.beginPath(); cx.moveTo(0,0); cx.arc(0,0,R-16,a0,a0+seg); cx.closePath();
     cx.fillStyle=PRIZES[k].c; cx.fill(); cx.lineWidth=4; cx.strokeStyle="#fff"; cx.stroke();
     cx.save(); cx.rotate(a0+seg/2);
-    cx.fillStyle = ["I1","ZC"].includes(k) ? "#13307a" : "#fff";
+    cx.fillStyle = ["IT","ZC"].includes(k) ? "#13307a" : "#fff";
     cx.font="800 34px Vazirmatn, Tahoma, sans-serif"; cx.textAlign="center"; cx.textBaseline="middle";
     cx.translate(R*0.6,0); cx.rotate(Math.PI/2);
     const label=PRIZES[k][lang][1], MAXW=150;
@@ -340,6 +339,9 @@ function showResult(celebrate){
   const save = p.save || (typeof p.was==="number" ? p.was-p.now : 0);
   $("rSave").hidden = !save;
   $("rSave").textContent = t.save + (p.save? t.upto:"") + fmt(save) + t.iqd;
+  $("rWarr").hidden = !p.w;
+  if(p.w) $("rWarr").textContent = "🛡️ " + (p.ortho ? t.warrO(p.w) : t.warr(p.w));
+  $("rTr").hidden = !p.tr; $("rTr").textContent = t.transfer;
   $("rCode").textContent = won.code;
   $("terms").innerHTML = t.terms.map(x=>`<li>${x}</li>`).join("");
   $("waBtn").href = "https://wa.me/"+WA+"?text="+encodeURIComponent(t.wa(name, won.code));
